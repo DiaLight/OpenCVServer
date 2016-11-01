@@ -1,0 +1,107 @@
+package stud.opencv.server;
+
+import stud.opencv.server.gui.PropertiesPanel;
+import stud.opencv.server.gui.StreamPanel;
+import stud.opencv.server.network.properties.PropertiesServer;
+import stud.opencv.server.network.stream.StreamServer;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class MainFrame extends JFrame {
+
+    private static MainFrame instance;
+
+    public static void repackAndFix() {
+        instance.pack();
+    }
+
+    private final StreamPanel streamPanel;
+    private final StreamServer streamServer;
+    private final PropertiesPanel propertiesPanel;
+    private final PropertiesServer propertiesServer;
+
+    public MainFrame(int port) {
+        instance = this;
+        streamPanel = new StreamPanel();
+        streamServer = new StreamServer(this.streamPanel, port);
+        propertiesPanel = new PropertiesPanel();
+        propertiesServer = new PropertiesServer(this.propertiesPanel, port);
+        propertiesPanel.setCallback(propertiesServer);
+        initComponents();
+    }
+
+    private void startServers() {
+        streamServer.start();
+        propertiesServer.start();
+    }
+
+    private void initComponents() {
+
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setTitle("OpenCV Server");
+        setMinimumSize(new Dimension(518, 279));
+
+        GroupLayout layout = new GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(streamPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(propertiesPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(propertiesPanel, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(streamPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        );
+
+        pack();
+        setLocationRelativeTo(null); //set frame location to center
+    }
+
+    public static void main(String[] args) {
+        if(args.length < 1) {
+            System.out.println("Args required: <port>");
+            return;
+        }
+        try {
+            int port = Integer.parseInt(args[0]);
+            if(port >= 0 && port < 65536) {
+                mainGui(port);
+            } else {
+                System.out.println("port must be between 0 and 65536");
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void mainGui(int port) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+         */
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+            ex.printStackTrace();
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        EventQueue.invokeLater(() -> {
+            MainFrame mainFrame = new MainFrame(port);
+            mainFrame.setVisible(true);
+            EventQueue.invokeLater(mainFrame::startServers);
+        });
+    }
+
+}
