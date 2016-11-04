@@ -94,13 +94,13 @@ public class PropertiesServer extends TCPPacketServer {
 
     private void onPacketSend(OutPacket packet) {
         if(DEBUG && !IGNORE_PACKETS.contains(packet.getClass())) {
-            System.out.printf("Out packet(%d): %s%n", packet.getId(), packet.toString());
+            System.out.printf("Out packet(id=%d): %s%n", packet.getId(), packet.toString());
         }
     }
 
     private void onPacketReceived(InPacket packet) {
         if(DEBUG && !IGNORE_PACKETS.contains(packet.getClass())) {
-            System.out.printf("In packet(%d): %s%n", packet.getId(), packet.toString());
+            System.out.printf("In packet(id=%d): %s%n", packet.getId(), packet.toString());
         }
         switch (packet.getId()) {
             case AllPropertiesPacket.ID:

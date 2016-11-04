@@ -13,7 +13,9 @@ public class MainFrame extends JFrame {
     private static MainFrame instance;
 
     public static void repackAndFix() {
-        instance.pack();
+        EventQueue.invokeLater(() -> {
+            instance.pack();
+        });
     }
 
     private final StreamPanel streamPanel;
@@ -40,7 +42,7 @@ public class MainFrame extends JFrame {
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setTitle("OpenCV Server");
-        setMinimumSize(new Dimension(518, 279));
+        setMinimumSize(new Dimension(484 + PropertiesPanel.PROP_WIDTH, 279));
 
         GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);

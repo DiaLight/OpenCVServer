@@ -61,6 +61,10 @@ public class StreamPanel extends JPanel {
 
     public void apply(BufferedImage img) {
         this.image = img;
+        if(img == null) {
+            repaint();
+            return;
+        }
         int width = image.getWidth();
         int height = image.getHeight();
         Dimension prefSize = getPreferredSize();

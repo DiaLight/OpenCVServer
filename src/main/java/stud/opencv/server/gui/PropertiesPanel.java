@@ -9,7 +9,6 @@ import stud.opencv.server.network.properties.protocol.structures.SelectProperty;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
-import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.text.NumberFormat;
 import java.util.HashMap;
@@ -23,9 +22,9 @@ import static javax.swing.BorderFactory.createBevelBorder;
  */
 public class PropertiesPanel extends JPanel {
 
-    private final Map<String, JSpinner> intProperties = new HashMap<>();
-    private final Map<String, JFormattedTextField> doubleProperties = new HashMap<>();
-    private final Map<String, JComboBox<String>> selectProperties = new HashMap<>();
+    public static final int PROP_WIDTH = 150;
+
+    private final Map<String, JComponent> properties = new HashMap<>();
 
     private PropertiesServer callback;
     public void setCallback(PropertiesServer callback) {this.callback = callback;}
@@ -83,7 +82,7 @@ public class PropertiesPanel extends JPanel {
 
     public void clear() {
         EventQueue.invokeLater(() -> {
-            intProperties.clear();
+            properties.clear();
             contentPanel.removeAll();
             this.horizPropGroup = propertiesPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING);
             propertiesPanelLayout.setHorizontalGroup(
@@ -138,51 +137,54 @@ public class PropertiesPanel extends JPanel {
     private void putInt(String key, int value) {
         EventQueue.invokeLater(() -> {
             JLabel propKey = new JLabel(key);
-            JSpinner propValue = intProperties.get(key);
+            JSpinner propValue = (JSpinner) properties.get(key);
             if(propValue == null) {
                 propValue = new JSpinner();
                 propValue.setValue(value);
-                intProperties.put(key, propValue);
+                properties.put(key, propValue);
                 propValue.addChangeListener(e -> {
                     int newVal = (int) ((JSpinner) e.getSource()).getValue();
                     callback.trySendPacket(new ChangePropertyPacket(key, new IntProperty(newVal)));
                 });
-                this.horizPropGroup.addGroup(propertiesPanelLayout.createSequentialGroup()
-                        .addComponent(propKey, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(propValue, GroupLayout.PREFERRED_SIZE, 84, GroupLayout.PREFERRED_SIZE));
-                this.vertPropGroup
-                        .addGroup(propertiesPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(propKey)
-                                .addComponent(propValue, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED);
+                addProperty(propKey, propValue);
             } else {
                 propValue.setValue(value);
             }
         });
     }
 
+    private void addProperty(JLabel propKey, JComponent propValue) {
+        this.horizPropGroup.addGroup(propertiesPanelLayout.createSequentialGroup()
+                .addComponent(propKey, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(propValue, GroupLayout.PREFERRED_SIZE, PROP_WIDTH, GroupLayout.PREFERRED_SIZE));
+        this.vertPropGroup
+                .addGroup(propertiesPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(propKey)
+                        .addComponent(propValue, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED);
+    }
+
     private void putDouble(String key, double value) {
         EventQueue.invokeLater(() -> {
             JLabel propKey = new JLabel(key);
-            JFormattedTextField propValue = doubleProperties.get(key);
+            JFormattedTextField propValue = (JFormattedTextField) properties.get(key);
             if(propValue == null) {
                 propValue = new JFormattedTextField(NumberFormat.getNumberInstance());
                 propValue.setValue(value);
-                doubleProperties.put(key, propValue);
+                properties.put(key, propValue);
                 propValue.addActionListener(e -> {
-                    double newVal = (double) ((JFormattedTextField) e.getSource()).getValue();
+                    Object val = ((JFormattedTextField) e.getSource()).getValue();
+                    double newVal;
+                    if(val instanceof Long) {
+                        newVal = (Long) val;
+                    } else {
+                        newVal = (double) val;
+                    }
+                    System.out.println(val.getClass());
                     callback.trySendPacket(new ChangePropertyPacket(key, new DoubleProperty(newVal)));
                 });
-                this.horizPropGroup.addGroup(propertiesPanelLayout.createSequentialGroup()
-                        .addComponent(propKey, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(propValue, GroupLayout.PREFERRED_SIZE, 84, GroupLayout.PREFERRED_SIZE));
-                this.vertPropGroup
-                        .addGroup(propertiesPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(propKey)
-                                .addComponent(propValue, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED);
+                addProperty(propKey, propValue);
             } else {
                 propValue.setValue(value);
             }
@@ -192,24 +194,16 @@ public class PropertiesPanel extends JPanel {
     private void putSelect(String key, int selected, List<String> selections) {
         EventQueue.invokeLater(() -> {
             JLabel propKey = new JLabel(key);
-            JComboBox<String> propValue = selectProperties.get(key);
+            JComboBox<String> propValue = (JComboBox<String>) properties.get(key);
             if(propValue == null) {
                 propValue = new JComboBox<>(selections.toArray(new String[0]));
                 propValue.setSelectedIndex(selected);
-                selectProperties.put(key, propValue);
+                properties.put(key, propValue);
                 propValue.addActionListener(e -> {
                     int newSel = ((JComboBox) e.getSource()).getSelectedIndex();
                     callback.trySendPacket(new ChangePropertyPacket(key, new SelectProperty(newSel)));
                 });
-                this.horizPropGroup.addGroup(propertiesPanelLayout.createSequentialGroup()
-                        .addComponent(propKey, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(propValue, GroupLayout.PREFERRED_SIZE, 84, GroupLayout.PREFERRED_SIZE));
-                this.vertPropGroup
-                        .addGroup(propertiesPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(propKey)
-                                .addComponent(propValue, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED);
+                addProperty(propKey, propValue);
             } else {
                 if (propValue.getSelectedIndex() != selected) {
                     propValue.setSelectedIndex(selected);
