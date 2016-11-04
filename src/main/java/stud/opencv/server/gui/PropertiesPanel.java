@@ -1,11 +1,19 @@
 package stud.opencv.server.gui;
 
 import stud.opencv.server.network.properties.PropertiesServer;
+import stud.opencv.server.network.properties.protocol.out.ChangePropertyPacket;
+import stud.opencv.server.network.properties.protocol.structures.DoubleProperty;
+import stud.opencv.server.network.properties.protocol.structures.IntProperty;
+import stud.opencv.server.network.properties.protocol.structures.Property;
+import stud.opencv.server.network.properties.protocol.structures.SelectProperty;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.swing.text.NumberFormatter;
 import java.awt.*;
+import java.text.NumberFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static javax.swing.BorderFactory.createBevelBorder;
@@ -15,7 +23,9 @@ import static javax.swing.BorderFactory.createBevelBorder;
  */
 public class PropertiesPanel extends JPanel {
 
-    private final Map<String, JSpinner> properties = new HashMap<>();
+    private final Map<String, JSpinner> intProperties = new HashMap<>();
+    private final Map<String, JFormattedTextField> doubleProperties = new HashMap<>();
+    private final Map<String, JComboBox<String>> selectProperties = new HashMap<>();
 
     private PropertiesServer callback;
     public void setCallback(PropertiesServer callback) {this.callback = callback;}
@@ -73,7 +83,7 @@ public class PropertiesPanel extends JPanel {
 
     public void clear() {
         EventQueue.invokeLater(() -> {
-            properties.clear();
+            intProperties.clear();
             contentPanel.removeAll();
             this.horizPropGroup = propertiesPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING);
             propertiesPanelLayout.setHorizontalGroup(
@@ -100,17 +110,42 @@ public class PropertiesPanel extends JPanel {
         });
     }
 
-    public void put(String key, int value) {
+    public void pong(long time) {
+        if(time < 0) {
+            ping.setText("");
+        } else {
+            ping.setText(String.format("ping: %d", System.currentTimeMillis() - time));
+        }
+    }
+
+    public void put(String key, Property value) {
+        switch (value.getType()) {
+            case INT:
+                IntProperty intProperty = (IntProperty) value;
+                putInt(key, intProperty.get());
+                break;
+            case DOUBLE:
+                DoubleProperty doubleProperty = (DoubleProperty) value;
+                putDouble(key, doubleProperty.get());
+                break;
+            case SELECT:
+                SelectProperty selectProperty = (SelectProperty) value;
+                putSelect(key, selectProperty.getSelected(), selectProperty.getSelections());
+                break;
+        }
+    }
+
+    private void putInt(String key, int value) {
         EventQueue.invokeLater(() -> {
             JLabel propKey = new JLabel(key);
-            JSpinner propValue = properties.get(key);
+            JSpinner propValue = intProperties.get(key);
             if(propValue == null) {
                 propValue = new JSpinner();
                 propValue.setValue(value);
-                properties.put(key, propValue);
+                intProperties.put(key, propValue);
                 propValue.addChangeListener(e -> {
                     int newVal = (int) ((JSpinner) e.getSource()).getValue();
-                    callback.setProperty(key, newVal);
+                    callback.trySendPacket(new ChangePropertyPacket(key, new IntProperty(newVal)));
                 });
                 this.horizPropGroup.addGroup(propertiesPanelLayout.createSequentialGroup()
                         .addComponent(propKey, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -127,11 +162,59 @@ public class PropertiesPanel extends JPanel {
         });
     }
 
-    public void pong(long time) {
-        if(time < 0) {
-            ping.setText("");
-        } else {
-            ping.setText(String.format("ping: %d", System.currentTimeMillis() - time));
-        }
+    private void putDouble(String key, double value) {
+        EventQueue.invokeLater(() -> {
+            JLabel propKey = new JLabel(key);
+            JFormattedTextField propValue = doubleProperties.get(key);
+            if(propValue == null) {
+                propValue = new JFormattedTextField(NumberFormat.getNumberInstance());
+                propValue.setValue(value);
+                doubleProperties.put(key, propValue);
+                propValue.addActionListener(e -> {
+                    double newVal = (double) ((JFormattedTextField) e.getSource()).getValue();
+                    callback.trySendPacket(new ChangePropertyPacket(key, new DoubleProperty(newVal)));
+                });
+                this.horizPropGroup.addGroup(propertiesPanelLayout.createSequentialGroup()
+                        .addComponent(propKey, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(propValue, GroupLayout.PREFERRED_SIZE, 84, GroupLayout.PREFERRED_SIZE));
+                this.vertPropGroup
+                        .addGroup(propertiesPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(propKey)
+                                .addComponent(propValue, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED);
+            } else {
+                propValue.setValue(value);
+            }
+        });
+    }
+
+    private void putSelect(String key, int selected, List<String> selections) {
+        EventQueue.invokeLater(() -> {
+            JLabel propKey = new JLabel(key);
+            JComboBox<String> propValue = selectProperties.get(key);
+            if(propValue == null) {
+                propValue = new JComboBox<>(selections.toArray(new String[0]));
+                propValue.setSelectedIndex(selected);
+                selectProperties.put(key, propValue);
+                propValue.addActionListener(e -> {
+                    int newSel = ((JComboBox) e.getSource()).getSelectedIndex();
+                    callback.trySendPacket(new ChangePropertyPacket(key, new SelectProperty(newSel)));
+                });
+                this.horizPropGroup.addGroup(propertiesPanelLayout.createSequentialGroup()
+                        .addComponent(propKey, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(propValue, GroupLayout.PREFERRED_SIZE, 84, GroupLayout.PREFERRED_SIZE));
+                this.vertPropGroup
+                        .addGroup(propertiesPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(propKey)
+                                .addComponent(propValue, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED);
+            } else {
+                if (propValue.getSelectedIndex() != selected) {
+                    propValue.setSelectedIndex(selected);
+                }
+            }
+        });
     }
 }

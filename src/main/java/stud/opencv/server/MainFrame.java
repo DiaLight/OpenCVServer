@@ -33,7 +33,7 @@ public class MainFrame extends JFrame {
 
     private void startServers() {
         streamServer.start();
-        propertiesServer.start();
+        propertiesServer.startAsync();
     }
 
     private void initComponents() {
