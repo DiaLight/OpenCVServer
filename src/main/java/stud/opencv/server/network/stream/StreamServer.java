@@ -11,6 +11,8 @@ import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 
+import static stud.opencv.server.AppState.*;
+
 /**
  * Created by DiaLight on 27.10.2016.
  */
@@ -22,6 +24,7 @@ public class StreamServer extends Thread {
 
     private final StreamPanel streamPanel;
     private final int port;
+    private DatagramSocket socket;
 
     public StreamServer(StreamPanel streamPanel, int port) {
         super("Stream server thread");
@@ -34,14 +37,14 @@ public class StreamServer extends Thread {
 
         try {
             //Keep a socket open to listen to all the UDP trafic that is destined for this port
-            DatagramSocket socket = new DatagramSocket(port, InetAddress.getByName("0.0.0.0"));
+            socket = new DatagramSocket(port, InetAddress.getByName("0.0.0.0"));
             socket.setBroadcast(true);
 
             byte[] buf = new byte[bufSize];
             ByteArrayInputStream bis = new ByteArrayInputStream(buf);
             DataInputStream dis = new DataInputStream(bis);
             long start = System.currentTimeMillis();
-            while (true) {
+            while (alive) {
                 //System.out.println(getClass().getName() + ">>>Ready to receive broadcast packets!");
 
                 //Receive a packet
@@ -67,5 +70,9 @@ public class StreamServer extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void stopAll() {
+        socket.close();
     }
 }

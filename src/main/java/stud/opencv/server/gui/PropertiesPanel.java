@@ -181,7 +181,6 @@ public class PropertiesPanel extends JPanel {
                     } else {
                         newVal = (double) val;
                     }
-                    System.out.println(val.getClass());
                     callback.trySendPacket(new ChangePropertyPacket(key, new DoubleProperty(newVal)));
                 });
                 addProperty(propKey, propValue);

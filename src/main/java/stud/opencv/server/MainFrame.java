@@ -7,6 +7,10 @@ import stud.opencv.server.network.stream.StreamServer;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+import static stud.opencv.server.AppState.*;
 
 public class MainFrame extends JFrame {
 
@@ -40,7 +44,21 @@ public class MainFrame extends JFrame {
 
     private void initComponents() {
 
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                alive = false;
+                streamServer.stopAll();
+                propertiesServer.stopAll();
+                EventQueue.invokeLater(() -> {
+                    for (Frame frame : Frame.getFrames()) {
+                        frame.dispose();
+                    }
+                });
+                System.exit(0);
+            }
+        });
         setTitle("OpenCV Server");
         setMinimumSize(new Dimension(484 + PropertiesPanel.PROP_WIDTH, 279));
 

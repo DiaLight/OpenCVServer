@@ -12,12 +12,13 @@ import stud.opencv.server.network.properties.protocol.out.PingPacket;
 import stud.opencv.server.network.properties.protocol.structures.Property;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import static stud.opencv.server.AppState.*;
 
 /**
  * Created by DiaLight on 27.10.2016.
@@ -59,21 +60,20 @@ public class PropertiesServer extends TCPPacketServer {
         try {
             bind();
             try {
-                while(true) {
+                while(alive) {
                     try {
+                        //prepare before waiting
+                        propertiesPanel.clear();
+                        propertiesPanel.setConnection("waiting for connection...");
+                        propertiesPanel.pong(-1);
+
+                        receiveConnection(); //waiting for connection
                         try {
-                            //prepare before waiting
-                            propertiesPanel.clear();
-                            propertiesPanel.setConnection("waiting for connection...");
-                            propertiesPanel.pong(-1);
-
-                            receiveConnection(); //waiting for connection
-
                             socket.setSoTimeout(5000); //5 second timeout(ping-pong every 3 seconds)
                             propertiesPanel.setConnection(socket.getInetAddress().toString());
                             sendPacket(new GetAllPropertiesPacket());
 
-                            while (!closed) {
+                            while (!closed && alive) {
                                 processPacket();
                             }
                         } finally {
@@ -123,4 +123,10 @@ public class PropertiesServer extends TCPPacketServer {
         }
     }
 
+    public void stopAll() {
+        closeConnection();
+        try {
+            closeServer();
+        } catch (IOException ignored) {}
+    }
 }

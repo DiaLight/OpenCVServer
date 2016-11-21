@@ -26,6 +26,7 @@ public abstract class TCPSocketServer {
 
     protected final void bind() throws IOException {
         ss = new ServerSocket(port);
+//        ss.setSoTimeout(2000);
     }
     protected final void closeServer() throws IOException {
         ss.close();
