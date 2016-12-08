@@ -4,14 +4,15 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * Created by dialight on 03.11.16.
  */
-public class SelectProperty extends Property {
+public class SelectProperty implements Property {
 
-    private List<String> selections;
+    private HashMap<Integer, String> selections;
     private int selected;
 
     public SelectProperty() {
@@ -24,10 +25,11 @@ public class SelectProperty extends Property {
     @Override
     public void read(DataInputStream dis) throws IOException {
         int size = dis.readByte();
-        selections = new ArrayList<>(size);
+        selections = new HashMap<>(size);
         for (int i = 0; i < size; i++) {
+            int key = dis.readByte();
             String var = dis.readUTF();
-            selections.add(var);
+            selections.put(key, var);
         }
         selected = dis.readByte();
     }
@@ -42,7 +44,7 @@ public class SelectProperty extends Property {
         return PropertyType.SELECT;
     }
 
-    public List<String> getSelections() {
+    public HashMap<Integer, String> getSelections() {
         return selections;
     }
 

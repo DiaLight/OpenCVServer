@@ -7,11 +7,11 @@ import java.io.IOException;
 /**
  * Created by dialight on 03.11.16.
  */
-public abstract class Property {
+public interface Property {
 
-    public abstract void read(DataInputStream dis) throws IOException;
-    public abstract void write(DataOutputStream dos) throws IOException;
+    void read(DataInputStream dis) throws IOException;
+    void write(DataOutputStream dos) throws IOException;
 
-    public abstract PropertyType getType();
+    PropertyType getType();
 
 }

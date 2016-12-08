@@ -82,17 +82,18 @@ public class MainFrame extends JFrame {
     }
 
     public static void main(String[] args) {
-        if(args.length < 1) {
-            System.out.println("Args required: <port>");
-            return;
-        }
         try {
-            int port = Integer.parseInt(args[0]);
-            if(port >= 0 && port < 65536) {
-                mainGui(port);
+            int port;
+            if(args.length < 1) {
+                port = 2016;
             } else {
-                System.out.println("port must be between 0 and 65536");
+                port = Integer.parseInt(args[0]);
+                if (port < 0 || port >= 65536) {
+                    System.err.println("port must be between 0 and 65536");
+                    return;
+                }
             }
+            mainGui(port);
         } catch (NumberFormatException e) {
             e.printStackTrace();
         }

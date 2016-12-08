@@ -7,7 +7,7 @@ import java.io.IOException;
 /**
  * Created by dialight on 03.11.16.
  */
-public class IntProperty extends Property {
+public class IntProperty implements Property {
 
     private int value;
 

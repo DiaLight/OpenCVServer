@@ -43,6 +43,10 @@ public class StreamPanel extends JPanel {
         );
     }
 
+    private int deltaAccumulator = 0;
+    private int deltaCount = 0;
+    private String fps = "";
+
     @Override
     public void paint(Graphics g) {
         if (image == null) {
@@ -52,9 +56,19 @@ public class StreamPanel extends JPanel {
         }
         g.drawImage(image, 0, 0, this);
         if(lastUpdate > 0) {
-            long fps = System.currentTimeMillis() - lastUpdate;
+            float delta = System.currentTimeMillis() - lastUpdate; // ms/fr
+
+            deltaAccumulator += delta;
+            deltaCount++;
+
+            if(deltaAccumulator > 300) {
+                int fps = deltaCount * 1000 / deltaAccumulator;
+                this.fps = String.format("FPS: %d", fps);
+                deltaAccumulator = 0;
+                deltaCount = 0;
+            }
             g.setColor(Color.RED);
-            g.drawString(String.format("FPS: %d", fps), 10, 20);
+            g.drawString(fps, 10, 20);
         }
         lastUpdate = System.currentTimeMillis();
     }

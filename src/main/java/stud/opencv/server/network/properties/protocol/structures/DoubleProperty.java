@@ -7,7 +7,7 @@ import java.io.IOException;
 /**
  * Created by dialight on 03.11.16.
  */
-public class DoubleProperty extends Property {
+public class DoubleProperty implements Property {
 
     private double value;
 

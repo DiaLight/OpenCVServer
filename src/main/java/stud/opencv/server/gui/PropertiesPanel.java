@@ -190,17 +190,18 @@ public class PropertiesPanel extends JPanel {
         });
     }
 
-    private void putSelect(String key, int selected, List<String> selections) {
+    private void putSelect(String key, int selected, HashMap<Integer, String> selections) {
         EventQueue.invokeLater(() -> {
             JLabel propKey = new JLabel(key);
             JComboBox<String> propValue = (JComboBox<String>) properties.get(key);
             if(propValue == null) {
-                propValue = new JComboBox<>(selections.toArray(new String[0]));
+                propValue = new JComboBox<>(selections.values().toArray(new String[0]));
                 propValue.setSelectedIndex(selected);
                 properties.put(key, propValue);
+                Integer[] keys = selections.keySet().toArray(new Integer[0]);
                 propValue.addActionListener(e -> {
                     int newSel = ((JComboBox) e.getSource()).getSelectedIndex();
-                    callback.trySendPacket(new ChangePropertyPacket(key, new SelectProperty(newSel)));
+                    callback.trySendPacket(new ChangePropertyPacket(key, new SelectProperty(keys[newSel])));
                 });
                 addProperty(propKey, propValue);
             } else {
