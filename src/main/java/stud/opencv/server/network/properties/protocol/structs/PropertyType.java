@@ -1,4 +1,4 @@
-package stud.opencv.server.network.properties.protocol.structures;
+package stud.opencv.server.network.properties.protocol.structs;
 
 import java.util.function.Supplier;
 

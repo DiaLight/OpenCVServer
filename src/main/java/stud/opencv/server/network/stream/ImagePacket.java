@@ -1,5 +1,7 @@
 package stud.opencv.server.network.stream;
 
+import javafx.scene.image.Image;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -39,7 +41,7 @@ public class ImagePacket {
         buffer.put(i, part);
     }
 
-    public BufferedImage getImage() {
+    public byte[] getBytes() {
         byte[] buf = new byte[size];
         int bufPos = 0;
         for (int i = 0; i < parts; i++) {
@@ -50,12 +52,19 @@ public class ImagePacket {
             System.arraycopy(part, 0, buf, bufPos, partSize);
             bufPos += partSize;
         }
+        return buf;
+    }
 
+    public BufferedImage getImage() {
         try {
-            return ImageIO.read(new ByteArrayInputStream(buf));
+            return ImageIO.read(new ByteArrayInputStream(getBytes()));
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public Image getFXImage() {
+        return new Image(new ByteArrayInputStream(getBytes()));
     }
 }

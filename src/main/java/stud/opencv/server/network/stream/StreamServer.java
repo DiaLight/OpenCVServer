@@ -2,14 +2,17 @@ package stud.opencv.server.network.stream;
 
 import stud.opencv.server.gui.StreamPanel;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static stud.opencv.server.AppState.*;
 
@@ -22,14 +25,18 @@ public class StreamServer extends Thread {
     public static final int bufSize = 64 * 1024 - 20 - 8 - 1;
     private final Map<Long, ImagePacket> frameMap = new HashMap<>();
 
-    private final StreamPanel streamPanel;
+    private Consumer<ImagePacket> handler = i -> {};
     private final int port;
     private DatagramSocket socket;
 
-    public StreamServer(StreamPanel streamPanel, int port) {
+    public StreamServer(int port) {
         super("Stream server thread");
-        this.streamPanel = streamPanel;
         this.port = port;
+    }
+
+    public void setHandler(Consumer<ImagePacket> handler) {
+        if(handler == null) handler = i -> {};
+        this.handler = handler;
     }
 
     @Override
@@ -63,10 +70,12 @@ public class StreamServer extends Thread {
                 imagePacket.read(dis);
                 bis.reset();
                 if(imagePacket.complete()) {
-                    streamPanel.apply(imagePacket.getImage());
+                    handler.accept(imagePacket);
                     frameMap.remove(frameIndex);
                 }
             }
+        } catch (SocketException e) {
+            System.out.println("Stream server closed");
         } catch (IOException e) {
             e.printStackTrace();
         }

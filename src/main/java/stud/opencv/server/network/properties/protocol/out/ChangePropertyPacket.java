@@ -1,7 +1,7 @@
 package stud.opencv.server.network.properties.protocol.out;
 
 import stud.opencv.server.network.properties.protocol.OutPacket;
-import stud.opencv.server.network.properties.protocol.structures.Property;
+import stud.opencv.server.network.properties.protocol.structs.Property;
 
 import java.io.DataOutputStream;
 import java.io.IOException;

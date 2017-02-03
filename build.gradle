@@ -12,7 +12,7 @@ repositories {
 jar {
     manifest {
         attributes(
-                'Main-Class': 'stud.opencv.server.MainFrame'
+                'Main-Class': 'stud.opencv.server.fx.MainFX'
         )
     }
 }

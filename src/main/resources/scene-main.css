@@ -1,0 +1,66 @@
+.root {
+    -fx-let-background-color: rgb(60, 63, 65);
+    -fx-let-selected-color: rgb(81, 86, 88);
+}
+
+.tab-pane {
+    -fx-background-color: -fx-let-background-color;
+}
+
+.main-view:pressed {
+    -fx-cursor: move;
+}
+
+.tab-pane .tab:pressed {
+    -fx-cursor: default;
+}
+
+.toggle-button {
+    -fx-background-color: -fx-let-background-color;
+    -fx-tab-min-width: 90px;
+    -fx-padding: 3 8 3 8;
+    -fx-border-color: #282828;
+    -fx-border-width: 1;
+    -fx-text-fill: #828282;
+    -fx-font-size: 13px;
+    /*-fx-font-weight: bold;*/
+}
+.toggle-button:selected {
+    -fx-background-color: -fx-let-selected-color;
+    -fx-text-fill: #c9c9c9;
+}
+
+.tab-pane .tab-header-area {
+    -fx-padding: 0;
+}
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-opacity: 0;
+}
+
+.tab-pane {
+    -fx-tab-min-width: 90px;
+}
+
+.tab-pane .tab {
+    -fx-background-color: -fx-let-background-color;
+    -fx-border-color: #282828;
+    -fx-border-width: 1;
+}
+
+.tab .tab-label {
+    -fx-alignment: CENTER;
+    -fx-text-fill: #828282;
+    /*-fx-font-size: 12px;*/
+    /*-fx-font-weight: bold;*/
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: -fx-let-selected-color;
+    -fx-focus-color: transparent;
+}
+
+.tab:selected .tab-label {
+    -fx-alignment: CENTER;
+    -fx-text-fill: #c9c9c9;
+}

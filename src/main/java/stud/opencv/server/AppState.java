@@ -5,6 +5,7 @@ package stud.opencv.server;
  */
 public class AppState {
 
+    @Deprecated
     public static volatile boolean alive = true;
 
     public static final Condition cond = new Condition();

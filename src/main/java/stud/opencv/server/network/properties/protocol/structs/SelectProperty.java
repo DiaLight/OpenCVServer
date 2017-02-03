@@ -1,11 +1,9 @@
-package stud.opencv.server.network.properties.protocol.structures;
+package stud.opencv.server.network.properties.protocol.structs;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by dialight on 03.11.16.

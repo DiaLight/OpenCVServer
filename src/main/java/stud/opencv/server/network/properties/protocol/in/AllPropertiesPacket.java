@@ -1,8 +1,8 @@
 package stud.opencv.server.network.properties.protocol.in;
 
 import stud.opencv.server.network.properties.protocol.InPacket;
-import stud.opencv.server.network.properties.protocol.structures.Property;
-import stud.opencv.server.network.properties.protocol.structures.PropertyType;
+import stud.opencv.server.network.properties.protocol.structs.Property;
+import stud.opencv.server.network.properties.protocol.structs.PropertyType;
 
 import java.io.DataInputStream;
 import java.io.IOException;

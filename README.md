@@ -25,4 +25,4 @@ This application I develop in Intellij Idea Community Edition.
 * Remove selection from `Create separate module per source set`
 * Set your `Gradle JVM` to **JDK** (Gradle requires `javac` in JDK to build java)
 * `Finish`
-* Main class where application starts from is `stud.opencv.server.MainFrame`
+* Main class where application starts from is `stud.opencv.server.fx.MainFX`

@@ -1,0 +1,61 @@
+.root {
+  -fx-glass-color: rgba(60, 63, 65, 0.8);
+  -fs-let-selected-color: #5b6062;
+}
+
+.server-properties {
+  -fx-padding: 5 10 5 10;
+  -fx-spacing: 10;
+  -fx-alignment: center;
+  -fx-font-size: 14;
+  -fx-background-color: -fx-glass-color;
+  -fx-border-color: derive(-fx-glass-color, -40%);
+  -fx-border-width: 3;
+  -fx-background-insets: 12;
+  -fx-border-insets: 10;
+  -fx-border-radius: 6;
+  -fx-background-radius: 6;
+}
+
+.server-properties:pressed {
+  -fx-cursor: move;
+}
+.server-property-value:pressed {
+  -fx-cursor: default;
+}
+
+.server-property {
+  -fx-padding: 1 0 1 0;
+  /*-fx-min-height: 30;*/
+  /*-fx-pref-height: 30;*/
+  /*-fx-max-height: 30;*/
+}
+.label {
+  -fx-text-fill: #c9c9c9;
+}
+.server-property-key.label {
+  -fx-padding: 0 20 0 0;
+  -fx-alignment: center;
+}
+.server-property-value.combo-box .list-cell {
+  -fx-padding: 0 0 0 8;
+  -fx-border-insets: 0 0 0 0;
+  -fx-background-color: -fs-let-selected-color;
+  -fx-text-fill: #c9c9c9;
+}
+.server-property-value {
+  /*-fx-border-color: black;*/
+  -fx-min-height: 24;
+  -fx-pref-height: 24;
+  -fx-background-color: -fs-let-selected-color;
+  /*-fx-max-height: 30;*/
+  -fx-mark-color: #c9c9c9;
+}
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button {
+  -fx-background-color: -fs-let-selected-color;
+}
+.spinner > .text-field {
+  -fx-background-color: -fs-let-selected-color;
+  -fx-text-fill: #c9c9c9;
+}
