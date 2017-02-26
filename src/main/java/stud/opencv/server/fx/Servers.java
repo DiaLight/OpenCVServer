@@ -1,5 +1,6 @@
 package stud.opencv.server.fx;
 
+import javafx.application.Platform;
 import stud.opencv.server.network.properties.PropertiesServer;
 import stud.opencv.server.network.stream.StreamServer;
 
@@ -14,7 +15,9 @@ public class Servers {
     public Servers(int port, Controller controller) {
         streamServer = new StreamServer(port);
         streamServer.setHandler(imagePacket -> {
-            controller.imageView.setImage(imagePacket.getFXImage());
+            Platform.runLater(() -> {
+                controller.imageView.setImage(imagePacket.getFXImage());
+            });
         });
 
         propertiesServer = new PropertiesServer(port);

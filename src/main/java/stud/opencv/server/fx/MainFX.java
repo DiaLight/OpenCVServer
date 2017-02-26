@@ -3,7 +3,6 @@ package stud.opencv.server.fx;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.ToggleButton;
@@ -28,7 +27,7 @@ public class MainFX extends Application {
         Arguments args = Arguments.parse(getParameters());
 
         // initialize the stage
-        primaryStage.setTitle("Hello World");
+        primaryStage.setTitle("OpenCV server");
 
         Controller controller = new Controller(primaryStage);
         Scene manualScene = new Scene(new AnchorPane(

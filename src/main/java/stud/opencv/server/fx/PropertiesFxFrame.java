@@ -141,9 +141,10 @@ public class PropertiesFxFrame implements PropertiesHandle {
     }
 
     private void putDouble(String key, double value) {
-        SpinnerValueFactory<Double> valueFactory = (SpinnerValueFactory<Double>) properties.get(key);
+        SpinnerValueFactory.DoubleSpinnerValueFactory valueFactory = (SpinnerValueFactory.DoubleSpinnerValueFactory) properties.get(key);
         if(valueFactory == null) {
             valueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 1000.0);
+            valueFactory.setAmountToStepBy(0.01);
             valueFactory.setValue(value);
             properties.put(key, valueFactory);
             valueFactory.valueProperty().addListener((observable, oldValue, newValue) ->
@@ -191,7 +192,7 @@ public class PropertiesFxFrame implements PropertiesHandle {
         while (iterator.hasNext()) {
             HBox box = (HBox) iterator.next();
             Label label = (Label) box.getChildren().get(0);
-            int compare = key.compareToIgnoreCase(label.getText());
+            int compare = key.compareTo(label.getText());
             if(compare < 0) {
                 children.add(i, hBox);
                 added = true;

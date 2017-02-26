@@ -1,13 +1,20 @@
 package stud.opencv.server.fx;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.*;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.Event;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Tab;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.MediaView;
@@ -43,15 +50,14 @@ public class Controller {
         this.imageView = new ImageView() {{
             setPickOnBounds(true);
             setPreserveRatio(true);
+            setCache(false);
             getStyleClass().add("main-view");
             imageProperty().addListener((observable, oldValue, newValue) -> {
                 if(oldValue == null || oldValue.getWidth() != newValue.getWidth() || oldValue.getHeight() != newValue.getHeight()) {
-                    Platform.runLater(() -> {
-
-                        setFitWidth(newValue.getWidth());
-                        setFitHeight(newValue.getHeight());
-                        primaryStage.sizeToScene();
-                    });
+                    setFitWidth(newValue.getWidth());
+                    setFitHeight(newValue.getHeight());
+                    System.out.println(newValue.getWidth() + ":" + newValue.getHeight());
+                    primaryStage.sizeToScene();
                 }
             });
             setImage(createImage());
@@ -66,6 +72,23 @@ public class Controller {
         g2.setColor(new Color(0x82, 0x82, 0x82));
         g2.setFont(new Font("TimesRoman", Font.PLAIN, 16));
         g2.drawString("No UDP Image packet received", 300 - 110, 200 - 10);
+
+        try {
+            int y = 25;
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+                NetworkInterface intf = en.nextElement();
+                if (intf.isLoopback()) continue;
+                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
+                    InetAddress inetAddress = enumIpAddr.nextElement();
+                    if (inetAddress.isLoopbackAddress()) continue;
+                    if (!(inetAddress instanceof Inet4Address)) continue;
+                    g2.drawString(inetAddress.getHostAddress(), 10, y);
+                    y += 20;
+                }
+            }
+        } catch (SocketException ignored) {}
+
+
         g2.dispose();
         return SwingFXUtils.toFXImage(img, null);
     }

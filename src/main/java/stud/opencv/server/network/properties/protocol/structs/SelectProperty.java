@@ -52,6 +52,9 @@ public class SelectProperty implements Property {
 
     @Override
     public String toString() {
-        return String.format("selected=%d, %s", selected, selections);
+        if(selections != null) {
+            return String.format("%d, %s", selected, selections);
+        }
+        return String.format("%d", selected);
     }
 }
